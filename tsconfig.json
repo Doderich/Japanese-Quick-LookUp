@@ -11,6 +11,9 @@
 		"importHelpers": true,
 		"isolatedModules": true,
 		"strictNullChecks": false,
+		"paths": {
+			"tslib": ["path/to/node_modules/tslib/tslib.d.ts"]
+		},
 		"lib": ["DOM", "ES5", "ES6", "ES7"]
 	},
 	"include": ["**/*.ts"]

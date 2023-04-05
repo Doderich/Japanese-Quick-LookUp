@@ -1,4 +1,5 @@
-import { Editor, Plugin } from "obsidian";
+const { Editor, Plugin } = require("obsidian");
+const deepl = require("deepl-node");
 import { ExplanationModalEnglish, ExplanationModalJapanese } from "./src/modal";
 import { EnglishTranslate, Jisho, Kanji } from "src/Jisho";
 import { SettingTab } from "src/settings";
@@ -40,11 +41,11 @@ export default class JishoPlugin extends Plugin {
 			id: "whats-this-kanji",
 			name: "Whats this Kanji",
 			hotkeys: [{ modifiers: ["Shift"], key: "s" }],
-			editorCallback: async (editor: Editor) => {
+			editorCallback: async (editor: any) => {
 				const selectedText = editor.getSelection();
-				const url =
-					this.settings.cors_url + this.settings.corse_id + "/";
-				const res: Jisho = await getDataJisho(url, selectedText);
+				const url = this.settings.cors_url + this.settings.corse_id;
+				const res: Jisho = await getDataJisho(url + "/", selectedText);
+				getTransaltion(url);
 				if (regex.test(selectedText)) {
 					new ExplanationModalJapanese(
 						this.app,
@@ -91,4 +92,25 @@ function formatForEnglishtoJapanese(jisho: Jisho): EnglishTranslate[] {
 		});
 	});
 	return returnArr;
+}
+
+async function getTransaltion(
+	cors_url: string,
+	text: string = "Hello, world!"
+) {
+	const authKey = "5aeb3dce-559a-489a-8b65-bab5ac5726a1:fx";
+	const translator = new deepl.Translator(authKey);
+	translator
+		.getUsage()
+		.then((usage: any) => {
+			console.log(usage);
+			return translator.translateText("Hello, world!", null, "fr");
+		})
+		.then((result: any) => {
+			console.log(result.text); // Bonjour, le monde !
+		})
+		.catch((error: any) => {
+			console.error(error);
+			process.exit(1);
+		});
 }
